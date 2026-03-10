@@ -1,282 +1,360 @@
 "use client"
 
-import AIchat from "..components/AIChat"
+import Sidebar from "@/components/Sidebar"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Papa from "papaparse"
 
 import {
-LineChart,
-Line,
-XAxis,
-YAxis,
-Tooltip,
-ResponsiveContainer,
-BarChart,
-Bar
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar
 } from "recharts"
+
+import {
+  Database,
+  Activity,
+  Columns,
+  BarChart3
+} from "lucide-react"
 
 export default function Dashboard() {
 
-const [data,setData] = useState<any[]>([])
-const [history,setHistory] = useState<string[]>([])
+  const [data, setData] = useState<any[]>([])
+  const [history, setHistory] = useState<string[]>([])
+  const [datasetCount, setDatasetCount] = useState(0)
 
-const handleFile = (file:File)=>{
+  const handleFile = (file: File | undefined) => {
 
-Papa.parse(file,{
-header:true,
-skipEmptyLines:true,
-complete:(results:any)=>{
-setData(results.data)
-setHistory(prev=>[file.name,...prev])
+    if (!file) return
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results: any) => {
+
+        const parsed = results.data
+
+        setData(parsed)
+        setHistory(prev => [file.name, ...prev])
+        setDatasetCount(prev => prev + 1)
+
+      }
+    })
+
+  }
+
+  const columns = data.length > 0 ? Object.keys(data[0]) : []
+
+  const xKey = columns[0]
+  const yKey = columns[1]
+
+  const columnsAnalyzed = columns.length
+
+  const visualizationsGenerated = columns.length > 1 ? 2 : 0
+
+  const analysesRun = history.length
+
+  return (
+
+    <div className="flex h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white overflow-hidden">
+
+      {/* SIDEBAR */}
+      <Sidebar />
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1 p-10 space-y-10 overflow-y-auto">
+
+        {/* Greeting */}
+
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+
+          <h1 className="text-3xl font-bold">
+            Hello 👋 Ready to analyze your data?
+          </h1>
+
+          <p className="text-gray-400 mt-2">
+            Here's an overview of your data analysis activity
+          </p>
+
+        </motion.div>
+
+
+        {/* Stats */}
+
+        <div className="grid md:grid-cols-4 gap-6">
+
+          <StatCard
+            title="Total Datasets"
+            value={datasetCount}
+            icon={Database}
+          />
+
+          <StatCard
+            title="Analyses Run"
+            value={analysesRun}
+            icon={Activity}
+          />
+
+          <StatCard
+            title="Columns Analyzed"
+            value={columnsAnalyzed}
+            icon={Columns}
+          />
+
+          <StatCard
+            title="Visualizations Generated"
+            value={visualizationsGenerated}
+            icon={BarChart3}
+          />
+
+        </div>
+
+
+        {/* Action Cards */}
+
+        <div className="grid md:grid-cols-3 gap-6">
+
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            className="bg-gradient-to-r from-purple-600 to-blue-600 p-8 rounded-xl cursor-pointer"
+          >
+
+            <h3 className="text-xl font-semibold">
+              Start New Analysis
+            </h3>
+
+            <p className="text-gray-200 text-sm mt-2">
+              Ask questions about your data
+            </p>
+
+          </motion.div>
+
+
+          <motion.label
+            whileHover={{ scale: 1.03 }}
+            className="bg-white/5 border border-white/10 p-8 rounded-xl cursor-pointer block"
+          >
+
+            <h3 className="text-xl font-semibold">
+              Upload Dataset
+            </h3>
+
+            <p className="text-gray-400 text-sm mt-2">
+              Add a new CSV file
+            </p>
+
+            <input
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={(e) => handleFile(e.target.files?.[0])}
+            />
+
+          </motion.label>
+
+
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            className="bg-white/5 border border-white/10 p-8 rounded-xl cursor-pointer"
+          >
+
+            <h3 className="text-xl font-semibold">
+              View History
+            </h3>
+
+            <p className="text-gray-400 text-sm mt-2">
+              Browse past analyses
+            </p>
+
+          </motion.div>
+
+        </div>
+
+
+        {/* Dataset Preview */}
+
+        {data.length > 0 && (
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/5 border border-white/10 rounded-xl p-6 overflow-auto"
+          >
+
+            <h3 className="text-xl font-semibold mb-4">
+              Dataset Preview
+            </h3>
+
+            <table className="w-full text-sm">
+
+              <thead className="bg-white/5">
+
+                <tr>
+                  {columns.map((col) => (
+                    <th key={col} className="p-3 text-left">{col}</th>
+                  ))}
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                {data.slice(0, 10).map((row: any, i) => (
+                  <tr key={i} className="border-t border-white/10">
+
+                    {columns.map((col) => (
+                      <td key={col} className="p-3">{row[col]}</td>
+                    ))}
+
+                  </tr>
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </motion.div>
+
+        )}
+
+
+        {/* Charts */}
+
+        {columns.length > 1 && (
+
+          <div className="grid md:grid-cols-2 gap-8">
+
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/5 border border-white/10 rounded-xl p-6"
+            >
+
+              <h3 className="mb-4 text-lg font-semibold">
+                Data Trends
+              </h3>
+
+              <ResponsiveContainer width="100%" height={250}>
+
+                <LineChart data={data.slice(0, 10)}>
+                  <XAxis dataKey={xKey} />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey={yKey} stroke="#a855f7" />
+                </LineChart>
+
+              </ResponsiveContainer>
+
+            </motion.div>
+
+
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white/5 border border-white/10 rounded-xl p-6"
+            >
+
+              <h3 className="mb-4 text-lg font-semibold">
+                Distribution
+              </h3>
+
+              <ResponsiveContainer width="100%" height={250}>
+
+                <BarChart data={data.slice(0, 10)}>
+                  <XAxis dataKey={xKey} />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey={yKey} fill="#6366f1" />
+                </BarChart>
+
+              </ResponsiveContainer>
+
+            </motion.div>
+
+          </div>
+
+        )}
+
+
+        {/* Dataset History */}
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/5 border border-white/10 rounded-xl p-6"
+        >
+
+          <h3 className="text-xl font-semibold mb-4">
+            📂 Recent Analyses
+          </h3>
+
+          <div className="space-y-2 text-gray-300 text-sm">
+
+            {history.length === 0 && (
+              <p className="text-gray-500">
+                No datasets uploaded yet.
+              </p>
+            )}
+
+            {history.map((file, i) => (
+              <p key={i} className="flex justify-between border-b border-white/10 pb-2">
+                {file}
+                <span className="text-gray-500">recent</span>
+              </p>
+            ))}
+
+          </div>
+
+        </motion.div>
+
+      </main>
+
+    </div>
+
+  )
 }
-})
 
-}
 
-const columns = data.length ? Object.keys(data[0]) : []
+function StatCard({
+  title,
+  value,
+  icon: Icon
+}: {
+  title: string
+  value: number
+  icon: any
+}) {
 
-return (
+  return (
 
-<div className="flex min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
+    <div className="bg-white/5 border border-white/10 p-6 rounded-xl flex items-center justify-between">
 
-{/* Sidebar */}
+      <div>
 
-<aside className="w-64 border-r border-white/10 p-6 space-y-8">
+        <p className="text-gray-400 text-sm">
+          {title}
+        </p>
 
-<h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-EDA AI
-</h1>
+        <h3 className="text-3xl font-bold mt-2">
+          {value}
+        </h3>
 
-<nav className="space-y-4 text-gray-300 text-sm">
+      </div>
 
-<p className="hover:text-white cursor-pointer">Dashboard</p>
-<p className="hover:text-white cursor-pointer">Datasets</p>
-<p className="hover:text-white cursor-pointer">Insights</p>
-<p className="hover:text-white cursor-pointer">History</p>
-<p className="hover:text-white cursor-pointer">Settings</p>
+      <Icon className="w-8 h-8 text-purple-400" />
 
-</nav>
+    </div>
 
-</aside>
+  )
 
-
-{/* Main */}
-
-<main className="flex-1 p-10 space-y-10 overflow-auto">
-
-{/* Header */}
-
-<motion.div
-initial={{opacity:0,y:-20}}
-animate={{opacity:1,y:0}}
-className="flex justify-between items-center"
->
-
-<h2 className="text-3xl font-bold">
-Dashboard
-</h2>
-
-<label className="bg-gradient-to-r from-purple-500 to-blue-500 px-6 py-2 rounded-lg cursor-pointer hover:scale-105 transition">
-
-Upload Dataset
-<input
-type="file"
-accept=".csv"
-className="hidden"
-onChange={(e:any)=>handleFile(e.target.files[0])}
-/>
-
-</label>
-
-</motion.div>
-
-
-{/* Drag Upload */}
-
-<motion.div
-whileHover={{scale:1.02}}
-className="border-2 border-dashed border-white/10 rounded-xl p-10 text-center"
->
-
-<p className="text-lg font-semibold">
-Drag & Drop Dataset
-</p>
-
-<p className="text-gray-400 text-sm mt-2">
-Upload CSV file to analyze your data
-</p>
-
-<input
-type="file"
-accept=".csv"
-className="mt-4"
-onChange={(e:any)=>handleFile(e.target.files[0])}
-/>
-
-</motion.div>
-
-
-{/* Dataset Table */}
-
-{data.length > 0 && (
-
-<motion.div
-initial={{opacity:0,y:40}}
-animate={{opacity:1,y:0}}
-className="bg-white/5 border border-white/10 rounded-xl p-6 overflow-auto"
->
-
-<h3 className="text-xl font-semibold mb-4">
-Dataset Preview
-</h3>
-
-<table className="w-full text-sm">
-
-<thead className="bg-white/5">
-
-<tr>
-{columns.map((col)=>(
-<th key={col} className="p-3 text-left">{col}</th>
-))}
-</tr>
-
-</thead>
-
-<tbody>
-
-{data.slice(0,10).map((row:any,i)=>(
-<tr key={i} className="border-t border-white/10">
-
-{columns.map(col=>(
-<td key={col} className="p-3">{row[col]}</td>
-))}
-
-</tr>
-))}
-
-</tbody>
-
-</table>
-
-</motion.div>
-
-)}
-
-
-{/* Charts */}
-
-<div className="grid md:grid-cols-2 gap-8">
-
-<motion.div
-initial={{opacity:0,y:40}}
-animate={{opacity:1,y:0}}
-className="bg-white/5 border border-white/10 rounded-xl p-6"
->
-
-<h3 className="mb-4 text-lg font-semibold">
-Data Trends
-</h3>
-
-<ResponsiveContainer width="100%" height={250}>
-
-<LineChart data={data.slice(0,6)}>
-
-<XAxis dataKey={columns[0]}/>
-<YAxis/>
-<Tooltip/>
-<Line type="monotone" dataKey={columns[1]} stroke="#a855f7"/>
-
-</LineChart>
-
-</ResponsiveContainer>
-
-</motion.div>
-
-
-<motion.div
-initial={{opacity:0,y:40}}
-animate={{opacity:1,y:0}}
-transition={{delay:0.2}}
-className="bg-white/5 border border-white/10 rounded-xl p-6"
->
-
-<h3 className="mb-4 text-lg font-semibold">
-Distribution
-</h3>
-
-<ResponsiveContainer width="100%" height={250}>
-
-<BarChart data={data.slice(0,6)}>
-
-<XAxis dataKey={columns[0]}/>
-<YAxis/>
-<Tooltip/>
-<Bar dataKey={columns[1]} fill="#6366f1"/>
-
-</BarChart>
-
-</ResponsiveContainer>
-
-</motion.div>
-
-</div>
-
-
-{/* AI Insights */}
-
-<motion.div
-initial={{opacity:0,y:40}}
-animate={{opacity:1,y:0}}
-className="bg-white/5 border border-white/10 rounded-xl p-6"
->
-
-<h3 className="text-xl font-semibold mb-4">
-🤖 AI Insights
-</h3>
-
-<ul className="space-y-3 text-gray-300 text-sm">
-
-<li>• Dataset successfully loaded.</li>
-<li>• Columns detected: {columns.length}</li>
-<li>• AI analysis will activate when backend is connected.</li>
-
-</ul>
-
-</motion.div>
-
-
-{/* Dataset History */}
-
-<motion.div
-initial={{opacity:0,y:40}}
-animate={{opacity:1,y:0}}
-transition={{delay:0.2}}
-className="bg-white/5 border border-white/10 rounded-xl p-6"
->
-
-<h3 className="text-xl font-semibold mb-4">
-📂 Dataset History
-</h3>
-
-<div className="space-y-2 text-gray-300 text-sm">
-
-{history.map((file,i)=>(
-<p key={i} className="flex justify-between border-b border-white/10 pb-2">
-
-{file}
-<span className="text-gray-500">recent</span>
-
-</p>
-))}
-
-</div>
-
-</motion.div>
-
-</main>
-
-</div>
-
-)
 }
