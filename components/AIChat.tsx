@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Send, Paperclip } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { Send, Paperclip, Database } from "lucide-react"
 
 type Message = {
   role: "user" | "assistant"
@@ -17,11 +17,17 @@ export default function AIChat({ userEmail }: Props) {
   const [messages,setMessages] = useState<Message[]>([])
   const [input,setInput] = useState("")
   const [loading,setLoading] = useState(false)
+  const [datasetName,setDatasetName] = useState<string | null>(null)
 
-  // User avatar generated from email
+  const chatEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(()=>{
+    chatEndRef.current?.scrollIntoView({behavior:"smooth"})
+  },[messages,loading])
+
   const userAvatar = userEmail
-    ? `https://ui-avatars.com/api/?name=${encodeURIComponent(userEmail)}&background=random&color=fff`
-    : "/user-avatar.png"
+  ? `https://ui-avatars.com/api/?name=${encodeURIComponent(userEmail)}&background=random&color=fff`
+  : "/user-avatar.png"
 
   const sendMessage = async () => {
 
@@ -36,7 +42,7 @@ export default function AIChat({ userEmail }: Props) {
     setInput("")
     setLoading(true)
 
-    try {
+    try{
 
       const res = await fetch("/api/ai",{
         method:"POST",
@@ -57,14 +63,12 @@ export default function AIChat({ userEmail }: Props) {
 
       setMessages(prev => [...prev,aiMessage])
 
-    } catch(err){
+    }catch{
 
-      const aiMessage:Message = {
-        role:"assistant",
-        content:"AI could not respond right now."
-      }
-
-      setMessages(prev => [...prev,aiMessage])
+      setMessages(prev => [
+        ...prev,
+        {role:"assistant",content:"AI could not respond right now."}
+      ])
 
     }
 
@@ -73,15 +77,15 @@ export default function AIChat({ userEmail }: Props) {
   }
 
   const handleKey = (e:React.KeyboardEvent<HTMLInputElement>)=>{
-    if(e.key === "Enter") sendMessage()
+    if(e.key==="Enter") sendMessage()
   }
 
-  // DATASET UPLOAD + ANALYSIS
   const handleFileUpload = async (e:React.ChangeEvent<HTMLInputElement>) => {
 
     const file = e.target.files?.[0]
-
     if(!file) return
+
+    setDatasetName(file.name)
 
     const userMessage:Message = {
       role:"user",
@@ -110,14 +114,12 @@ export default function AIChat({ userEmail }: Props) {
 
       setMessages(prev => [...prev,aiMessage])
 
-    }catch(err){
+    }catch{
 
-      const aiMessage:Message = {
-        role:"assistant",
-        content:"Dataset uploaded but analysis service is not available."
-      }
-
-      setMessages(prev => [...prev,aiMessage])
+      setMessages(prev => [
+        ...prev,
+        {role:"assistant",content:"Dataset uploaded but analysis service is unavailable."}
+      ])
 
     }
 
@@ -127,23 +129,56 @@ export default function AIChat({ userEmail }: Props) {
 
   return (
 
-    <div className="flex flex-col h-full max-w-4xl mx-auto">
+    <div className="flex flex-col h-full max-w-5xl mx-auto">
+
+      {/* Header */}
+
+      <div className="border-b border-white/10 p-6 flex items-center justify-between">
+
+        <div className="flex items-center gap-3">
+
+          <div className="p-2 rounded-lg bg-purple-500/20">
+            <Database className="text-purple-400"/>
+          </div>
+
+          <div>
+
+            <h1 className="text-lg font-semibold">
+              AI Data Analyst
+            </h1>
+
+            <p className="text-sm text-gray-400">
+              Upload a dataset and ask questions about it
+            </p>
+
+          </div>
+
+        </div>
+
+        {datasetName && (
+
+          <div className="text-xs bg-white/5 border border-white/10 px-4 py-2 rounded-lg">
+            Analyzing: <span className="text-purple-400">{datasetName}</span>
+          </div>
+
+        )}
+
+      </div>
 
       {/* Messages */}
 
-      <div className="flex-1 overflow-y-auto p-8 space-y-6">
+      <div className="flex-1 overflow-y-auto p-8 space-y-8">
 
         {messages.length === 0 && (
 
-          <div className="text-center text-gray-400 mt-24">
+          <div className="text-center text-gray-400 mt-32">
 
             <h2 className="text-3xl font-semibold mb-4">
-              AI Dataset Assistant
+              Hello! I'm your AI data analyst
             </h2>
 
             <p>
-              Upload a dataset or ask questions about correlations,
-              trends, outliers, and statistical insights.
+              Select or upload a dataset and ask anything about your data.
             </p>
 
           </div>
@@ -154,57 +189,62 @@ export default function AIChat({ userEmail }: Props) {
 
           <div
             key={i}
-            className={`flex items-end gap-3 ${
-              msg.role === "user"
+            className={`flex gap-4 ${
+              msg.role==="user"
               ? "justify-end"
               : "justify-start"
             }`}
           >
 
-            {/* AI Avatar */}
+            {msg.role==="assistant" && (
 
-            {msg.role === "assistant" && (
-              <img
-                src="/ai-avatar.png"
-                className="w-10 h-10 rounded-full object-cover border border-white/20"
-              />
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 flex-shrink-0">
+                <img
+                  src="/ai-avatar.png"
+                  alt="AI"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
             )}
 
-            {/* Bubble */}
-
             <div
-              className={`max-w-[70%] px-5 py-3 rounded-2xl shadow-md text-sm ${
-                msg.role === "user"
+              className={`max-w-[65%] px-5 py-3 rounded-2xl text-sm shadow-md ${
+                msg.role==="user"
                 ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
-                : "bg-white text-black"
+                : "bg-white/90 text-black"
               }`}
             >
               {msg.content}
             </div>
 
-            {/* User Avatar */}
+            {msg.role==="user" && (
 
-            {msg.role === "user" && (
-              <img
-                src={userAvatar}
-                className="w-10 h-10 rounded-full object-cover border border-white/20"
-              />
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 flex-shrink-0">
+                <img
+                  src={userAvatar}
+                  alt="User"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
             )}
 
           </div>
 
         ))}
 
-        {/* Typing indicator */}
-
         {loading && (
 
           <div className="flex items-center gap-3">
 
-            <img
-              src="/ai-avatar.png"
-              className="w-10 h-10 rounded-full object-cover border border-white/20 animate-pulse"
-            />
+            <div className="w-10 h-10 rounded-full overflow-hidden animate-pulse flex-shrink-0">
+              <img
+                src="/ai-avatar.png"
+                alt="AI"
+                className="w-full h-full object-cover"
+              />
+            </div>
 
             <div className="bg-white text-black px-4 py-2 rounded-xl text-sm">
               AI is analyzing...
@@ -214,6 +254,8 @@ export default function AIChat({ userEmail }: Props) {
 
         )}
 
+        <div ref={chatEndRef} />
+
       </div>
 
       {/* Input */}
@@ -222,7 +264,7 @@ export default function AIChat({ userEmail }: Props) {
 
         <div className="flex items-center gap-4">
 
-          {/* Upload dataset */}
+          {/* Upload */}
 
           <label className="cursor-pointer p-3 rounded-xl bg-white/5 hover:bg-white/10 transition">
 
@@ -243,18 +285,20 @@ export default function AIChat({ userEmail }: Props) {
             value={input}
             onChange={(e)=>setInput(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Ask something about your dataset..."
-            className="flex-1 bg-black/40 border border-white/10 rounded-xl px-5 py-3 outline-none"
+            placeholder="Ask the AI about trends, correlations, or anomalies..."
+            className="flex-1 bg-black/40 border border-white/10 rounded-xl px-5 py-3 outline-none focus:border-purple-500"
           />
 
           {/* Send */}
 
           <button
             onClick={sendMessage}
-            className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 px-5 py-3 rounded-xl hover:scale-105 transition"
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 px-6 py-3 rounded-xl hover:scale-105 transition"
           >
+
             <Send size={18}/>
             Send
+
           </button>
 
         </div>

@@ -7,7 +7,7 @@ export default function Pricing(){
 
 return(
 
-<section className="py-24 px-6 max-w-6xl mx-auto">
+<section id="pricing" className="py-24 px-6 max-w-6xl mx-auto">
 
 {/* Title */}
 

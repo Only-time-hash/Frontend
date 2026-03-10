@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Papa from "papaparse"
+import { useRouter } from "next/navigation"
 
 import {
   LineChart,
@@ -24,6 +25,8 @@ import {
 } from "lucide-react"
 
 export default function Dashboard() {
+
+  const router = useRouter()
 
   const [data, setData] = useState<any[]>([])
   const [history, setHistory] = useState<string[]>([])
@@ -55,19 +58,15 @@ export default function Dashboard() {
   const yKey = columns[1]
 
   const columnsAnalyzed = columns.length
-
   const visualizationsGenerated = columns.length > 1 ? 2 : 0
-
   const analysesRun = history.length
 
   return (
 
     <div className="flex h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white overflow-hidden">
 
-      {/* SIDEBAR */}
       <Sidebar />
 
-      {/* MAIN CONTENT */}
       <main className="flex-1 p-10 space-y-10 overflow-y-auto">
 
         {/* Greeting */}
@@ -92,29 +91,13 @@ export default function Dashboard() {
 
         <div className="grid md:grid-cols-4 gap-6">
 
-          <StatCard
-            title="Total Datasets"
-            value={datasetCount}
-            icon={Database}
-          />
+          <StatCard title="Total Datasets" value={datasetCount} icon={Database} />
 
-          <StatCard
-            title="Analyses Run"
-            value={analysesRun}
-            icon={Activity}
-          />
+          <StatCard title="Analyses Run" value={analysesRun} icon={Activity} />
 
-          <StatCard
-            title="Columns Analyzed"
-            value={columnsAnalyzed}
-            icon={Columns}
-          />
+          <StatCard title="Columns Analyzed" value={columnsAnalyzed} icon={Columns} />
 
-          <StatCard
-            title="Visualizations Generated"
-            value={visualizationsGenerated}
-            icon={BarChart3}
-          />
+          <StatCard title="Visualizations Generated" value={visualizationsGenerated} icon={BarChart3} />
 
         </div>
 
@@ -123,8 +106,11 @@ export default function Dashboard() {
 
         <div className="grid md:grid-cols-3 gap-6">
 
+          {/* Start New Analysis */}
+
           <motion.div
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.05 }}
+            onClick={() => router.push("/ai-analyst")}
             className="bg-gradient-to-r from-purple-600 to-blue-600 p-8 rounded-xl cursor-pointer"
           >
 
@@ -139,9 +125,12 @@ export default function Dashboard() {
           </motion.div>
 
 
-          <motion.label
-            whileHover={{ scale: 1.03 }}
-            className="bg-white/5 border border-white/10 p-8 rounded-xl cursor-pointer block"
+          {/* Upload Dataset */}
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            onClick={() => router.push("/datasets")}
+            className="bg-white/5 border border-white/10 p-8 rounded-xl cursor-pointer"
           >
 
             <h3 className="text-xl font-semibold">
@@ -152,18 +141,14 @@ export default function Dashboard() {
               Add a new CSV file
             </p>
 
-            <input
-              type="file"
-              accept=".csv"
-              className="hidden"
-              onChange={(e) => handleFile(e.target.files?.[0])}
-            />
+          </motion.div>
 
-          </motion.label>
 
+          {/* View History */}
 
           <motion.div
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.05 }}
+            onClick={() => router.push("/history")}
             className="bg-white/5 border border-white/10 p-8 rounded-xl cursor-pointer"
           >
 
@@ -284,38 +269,53 @@ export default function Dashboard() {
           </div>
 
         )}
+		
+		{/* Recent History */}
 
+<motion.div
+  initial={{ opacity: 0, y: 40 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="bg-white/5 border border-white/10 rounded-xl p-6"
+>
 
-        {/* Dataset History */}
+  <h3 className="text-xl font-semibold mb-4">
+    Recent History
+  </h3>
 
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 border border-white/10 rounded-xl p-6"
+  {history.length === 0 ? (
+
+    <p className="text-gray-400 text-sm">
+      No analyses yet. Upload a dataset to begin.
+    </p>
+
+  ) : (
+
+    <ul className="space-y-3">
+
+      {history.slice(0, 5).map((item, index) => (
+
+        <li
+          key={index}
+          className="flex items-center justify-between bg-white/5 border border-white/10 p-3 rounded-lg"
         >
 
-          <h3 className="text-xl font-semibold mb-4">
-            📂 Recent Analyses
-          </h3>
+          <span className="text-sm text-gray-300">
+            {item}
+          </span>
 
-          <div className="space-y-2 text-gray-300 text-sm">
+          <span className="text-xs text-purple-400">
+            Dataset
+          </span>
 
-            {history.length === 0 && (
-              <p className="text-gray-500">
-                No datasets uploaded yet.
-              </p>
-            )}
+        </li>
 
-            {history.map((file, i) => (
-              <p key={i} className="flex justify-between border-b border-white/10 pb-2">
-                {file}
-                <span className="text-gray-500">recent</span>
-              </p>
-            ))}
+      ))}
 
-          </div>
+    </ul>
 
-        </motion.div>
+  )}
+
+</motion.div>
 
       </main>
 

@@ -2,7 +2,7 @@
 
 import Sidebar from "@/components/Sidebar"
 import { useState, useEffect } from "react"
-import { Upload } from "lucide-react"
+import { Upload, Eye, Trash2 } from "lucide-react"
 
 export default function DatasetsPage(){
 
@@ -195,17 +195,31 @@ export default function DatasetsPage(){
 
                   <td className="p-4">{d.date}</td>
 
-                  <td className="p-4 flex gap-4">
+                  <td className="p-4 flex items-center gap-4">
+
+                    {/* Eye icon */}
+
+                    <button
+                      className="text-gray-400 hover:text-blue-400 transition"
+                      title="Preview Dataset"
+                    >
+                      <Eye size={18}/>
+                    </button>
+
+                    {/* View text */}
 
                     <button className="text-blue-400 hover:underline">
                       View
                     </button>
 
+                    {/* Delete icon */}
+
                     <button
                       onClick={()=>deleteDataset(i)}
-                      className="text-red-400 hover:underline"
+                      className="text-gray-400 hover:text-red-500 transition"
+                      title="Delete Dataset"
                     >
-                      Delete
+                      <Trash2 size={18}/>
                     </button>
 
                   </td>
