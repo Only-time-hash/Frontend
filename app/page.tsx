@@ -3,6 +3,8 @@ import Features from "../components/Features"
 import NavBar from "../components/Navbar"
 import Hero from "../components/Hero"
 import Background from "../components/Background"
+import Pricing from "../components/pricing"
+import Footer from "../components/footer"
 
 export default function Home() {
   return (
@@ -18,6 +20,9 @@ export default function Home() {
 	<Features/>
 	
 	<HowItWorks/>
+	
+	<Pricing/>
+	<Footer/>
 	
     </main>
   )

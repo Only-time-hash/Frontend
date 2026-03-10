@@ -6,6 +6,7 @@ import { useState } from "react"
 import Logo from "@/components/Logo"
 import Image from "next/image"
 import Link from "next/link"
+import { TrendingUp, PieChart, BarChart3, Activity } from "lucide-react"
 
 export default function Login() {
 
@@ -14,6 +15,7 @@ export default function Login() {
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
   const [error,setError] = useState("")
+  const [remember,setRemember] = useState(false)
 
   function handleLogin(e:any){
 
@@ -31,118 +33,165 @@ export default function Login() {
 
   return(
 
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black text-white px-6">
+    <div className="min-h-screen grid md:grid-cols-2">
 
-      {/* Animated glow background */}
+      {/* LEFT SIDE */}
 
-      <div className="absolute w-[600px] h-[600px] bg-purple-600/20 blur-[140px] rounded-full top-10 left-10"></div>
-      <div className="absolute w-[500px] h-[500px] bg-blue-600/20 blur-[140px] rounded-full bottom-10 right-10"></div>
+      <div className="relative flex flex-col justify-center px-12 text-white bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600">
 
-      <motion.div
-        initial={{opacity:0,y:40}}
-        animate={{opacity:1,y:0}}
-        transition={{duration:0.6}}
-        className="relative w-full max-w-md p-10 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl"
-      >
-
-        <div className="flex justify-center mb-8">
+        <div className="absolute top-8 left-10 flex items-center gap-2">
           <Logo/>
+          
         </div>
 
-        <h1 className="text-2xl font-semibold text-center mb-2">
-          Welcome back
-        </h1>
-
-        <p className="text-gray-400 text-center mb-6">
-          Sign in to continue to your dashboard
-        </p>
-
-
-        {/* Google login */}
-
-        <button
-          onClick={()=>router.push("/dashboard")}
-          className="w-full flex items-center justify-center gap-3 border border-white/20 py-3 rounded-lg hover:bg-white/10 transition"
+        <motion.div
+          initial={{opacity:0,x:-40}}
+          animate={{opacity:1,x:0}}
+          transition={{duration:0.6}}
         >
 
-          <Image
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="google"
-            width={20}
-            height={20}
-          />
+          <h1 className="text-4xl font-bold mb-6 leading-tight">
+            Turn Raw Data into <br/> Actionable Insights.
+          </h1>
 
-          Continue with Google
-
-        </button>
-
-
-        {/* Divider */}
-
-        <div className="flex items-center my-6">
-
-          <div className="flex-1 border-t border-white/20"></div>
-
-          <span className="px-3 text-gray-400 text-sm">
-            or
-          </span>
-
-          <div className="flex-1 border-t border-white/20"></div>
-
-        </div>
-
-
-        {error && (
-          <p className="text-red-400 text-sm text-center mb-4">
-            {error}
+          <p className="text-blue-100 max-w-md mb-10">
+            Upload your datasets, ask questions in plain English,
+            and get instant AI-powered visualizations and analysis.
           </p>
-        )}
+
+          {/* Feature boxes */}
+
+          <div className="grid grid-cols-2 gap-5 max-w-md">
+
+            <div className="bg-white/10 border border-white/20 rounded-xl p-5 backdrop-blur">
+              <TrendingUp className="mb-2"/>
+              <p className="text-sm">Trend Analysis</p>
+            </div>
+
+            <div className="bg-white/10 border border-white/20 rounded-xl p-5 backdrop-blur">
+              <PieChart className="mb-2"/>
+              <p className="text-sm">Distribution</p>
+            </div>
+
+            <div className="bg-white/10 border border-white/20 rounded-xl p-5 backdrop-blur">
+              <Activity className="mb-2"/>
+              <p className="text-sm">Correlation</p>
+            </div>
+
+            <div className="bg-white/10 border border-white/20 rounded-xl p-5 backdrop-blur">
+              <BarChart3 className="mb-2"/>
+              <p className="text-sm">Comparison</p>
+            </div>
+
+          </div>
+
+        </motion.div>
+
+      </div>
 
 
-        {/* Form */}
+      {/* RIGHT SIDE LOGIN */}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+      <div className="flex items-center justify-center bg-gray-50 px-6">
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e)=>setEmail(e.target.value)}
-            className="w-full p-3 rounded-lg bg-black/40 border border-white/20 focus:outline-none focus:border-purple-400"
-          />
+        <motion.div
+          initial={{opacity:0,y:40}}
+          animate={{opacity:1,y:0}}
+          transition={{duration:0.6}}
+          className="w-full max-w-md bg-white rounded-xl shadow-xl p-8"
+        >
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e)=>setPassword(e.target.value)}
-            className="w-full p-3 rounded-lg bg-black/40 border border-white/20 focus:outline-none focus:border-purple-400"
-          />
+          <h2 className="text-2xl font-semibold mb-1 text-gray-800">
+            Login to EDA AI
+          </h2>
 
-          <button
-            type="submit"
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-[1.02] transition"
-          >
-            Sign In
-          </button>
+          <p className="text-gray-500 mb-6 text-sm">
+            Welcome back! Please enter your details.
+          </p>
 
-        </form>
+          {error && (
+            <p className="text-red-500 text-sm mb-4">
+              {error}
+            </p>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+
+            <div>
+              <label className="text-sm text-gray-600">
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e)=>setEmail(e.target.value)}
+                className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-gray-600">
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e)=>setPassword(e.target.value)}
+                className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
 
-        <p className="text-center text-gray-400 mt-6">
+            {/* Remember + Forgot */}
 
-          Don't have an account?
+            <div className="flex items-center justify-between text-sm">
 
-          <Link
-            href="/register"
-            className="text-purple-400 ml-2 hover:underline"
-          >
-            Create one
-          </Link>
+              <label className="flex items-center gap-2 text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={()=>setRemember(!remember)}
+                />
+                Remember me
+              </label>
 
-        </p>
+              <a href="#" className="text-blue-600 hover:underline">
+                Forgot password?
+              </a>
 
-      </motion.div>
+            </div>
+
+
+            <button
+              type="submit"
+              className="w-full py-3 rounded-lg text-white font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition"
+            >
+              Login
+            </button>
+
+          </form>
+
+
+          <p className="text-sm text-center text-gray-500 mt-6">
+            Don't have an account?
+            <Link
+              href="/register"
+              className="text-blue-600 ml-1 hover:underline"
+            >
+              Sign up
+            </Link>
+          </p>
+
+
+          <p className="text-xs text-gray-400 text-center mt-6">
+            By continuing, you agree to EDA AI's Terms of Service and Privacy Policy
+          </p>
+
+        </motion.div>
+
+      </div>
 
     </div>
   )
