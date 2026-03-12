@@ -110,7 +110,7 @@ export default function Dashboard() {
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            onClick={() => router.push("/ai-analyst")}
+            onClick={() => router.push("/ai")}
             className="bg-gradient-to-r from-purple-600 to-blue-600 p-8 rounded-xl cursor-pointer"
           >
 
