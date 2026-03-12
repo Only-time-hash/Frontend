@@ -2,80 +2,95 @@
 
 import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis } from "recharts"
 
-const datasetData=[
- {name:"CSV",value:8234},
- {name:"Excel",value:6842},
- {name:"JSON",value:2318},
- {name:"Other",value:1000},
-]
+interface Props{
+ datasetData?: {name:string,value:number}[]
+ systemHealth?: {name:string,value:number}[]
+}
 
 const colors=["#2563eb","#10b981","#f59e0b","#6b7280"]
 
-const systemHealth=[
- {name:"CPU",value:45},
- {name:"Memory",value:62},
- {name:"Storage",value:38},
- {name:"Network",value:28},
-]
+export default function SystemOverview({
+ datasetData=[],
+ systemHealth=[]
+}:Props){
 
-export default function SystemOverview(){
+ const noData = datasetData.length === 0 && systemHealth.length === 0
 
-return(
+ if(noData){
+  return(
 
-<div className="grid grid-cols-2 gap-6 mt-6">
+   <div className="bg-white p-8 rounded-xl shadow text-center">
 
-{/* Dataset Distribution */}
+     <h3 className="font-semibold text-lg mb-2">
+       System Overview
+     </h3>
 
-<div className="bg-white p-6 rounded-xl shadow">
+     <p className="text-gray-500 text-sm">
+       No system metrics available yet.
+       Dataset distribution and system health will appear when the backend starts sending data.
+     </p>
 
-<h3 className="font-semibold mb-4">
-Dataset Distribution
-</h3>
+   </div>
 
-<PieChart width={400} height={250}>
-<Pie
-data={datasetData}
-dataKey="value"
-cx="50%"
-cy="50%"
-outerRadius={80}
-label
->
+  )
+ }
 
-{datasetData.map((entry,index)=>(
-<Cell key={index} fill={colors[index]} />
-))}
+ return(
 
-</Pie>
+ <div className="grid grid-cols-2 gap-6 mt-6">
 
-<Tooltip/>
+ {/* Dataset Distribution */}
 
-</PieChart>
+ <div className="bg-white p-6 rounded-xl shadow">
 
-</div>
+ <h3 className="font-semibold mb-4">
+ Dataset Distribution
+ </h3>
 
-{/* System Health */}
+ <PieChart width={400} height={250}>
+ <Pie
+ data={datasetData}
+ dataKey="value"
+ cx="50%"
+ cy="50%"
+ outerRadius={80}
+ label
+ >
 
-<div className="bg-white p-6 rounded-xl shadow">
+ {datasetData.map((entry,index)=>(
+ <Cell key={index} fill={colors[index % colors.length]} />
+ ))}
 
-<h3 className="font-semibold mb-4">
-System Health Metrics
-</h3>
+ </Pie>
 
-<BarChart width={400} height={250} data={systemHealth} layout="vertical">
+ <Tooltip/>
 
-<XAxis type="number"/>
-<YAxis type="category" dataKey="name"/>
-<Tooltip/>
+ </PieChart>
 
-<Bar dataKey="value" fill="#10b981"/>
+ </div>
 
-</BarChart>
+ {/* System Health */}
 
-</div>
+ <div className="bg-white p-6 rounded-xl shadow">
 
-</div>
+ <h3 className="font-semibold mb-4">
+ System Health Metrics
+ </h3>
 
-)
+ <BarChart width={400} height={250} data={systemHealth} layout="vertical">
+
+ <XAxis type="number"/>
+ <YAxis type="category" dataKey="name"/>
+ <Tooltip/>
+
+ <Bar dataKey="value" fill="#10b981"/>
+
+ </BarChart>
+
+ </div>
+
+ </div>
+
+ )
 
 }

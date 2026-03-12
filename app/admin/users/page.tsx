@@ -1,15 +1,52 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import MetricCard from "@/components/admin/MetricCard"
 import UserTable from "@/components/admin/UserTable"
 
 export default function UserManagement() {
 
+const [stats,setStats] = useState({
+ totalUsers:0,
+ activeToday:0,
+ newThisWeek:0,
+ suspended:0
+})
+
+useEffect(()=>{
+
+ async function loadUserStats(){
+
+  try{
+
+   const res = await fetch("/api/admin/users/stats")
+
+   if(!res.ok) return
+
+   const data = await res.json()
+
+   setStats({
+    totalUsers:data.totalUsers || 0,
+    activeToday:data.activeToday || 0,
+    newThisWeek:data.newThisWeek || 0,
+    suspended:data.suspended || 0
+   })
+
+  }catch(err){
+
+   console.log("User stats API not ready yet")
+
+  }
+
+ }
+
+ loadUserStats()
+
+},[])
+
 return (
 
 <div className="w-full">
-
-{/* Page Header */}
 
 <h1 className="text-3xl font-bold">
 User Management
@@ -25,25 +62,25 @@ Manage and monitor platform users
 
 <MetricCard
 title="Total Users"
-value="2,847"
+value={stats.totalUsers}
 sub=""
 />
 
 <MetricCard
 title="Active Today"
-value="1,423"
+value={stats.activeToday}
 sub=""
 />
 
 <MetricCard
 title="New This Week"
-value="124"
+value={stats.newThisWeek}
 sub=""
 />
 
 <MetricCard
 title="Suspended"
-value="18"
+value={stats.suspended}
 sub=""
 />
 

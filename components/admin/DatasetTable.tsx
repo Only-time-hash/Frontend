@@ -1,110 +1,166 @@
-import { Download } from "lucide-react";
+"use client"
 
-const datasets = [
-  {
-    name: "sales_data_2024.csv",
-    owner: "sarah.smith@example.com",
-    type: "CSV",
-    size: "2.4 MB",
-    rows: "15,420",
-    columns: "28",
-    date: "Mar 2, 2026",
-    analyses: "12 analyses",
-  },
-  {
-    name: "customer_behavior.xlsx",
-    owner: "john.doe@example.com",
-    type: "Excel",
-    size: "5.8 MB",
-    rows: "42,380",
-    columns: "35",
-    date: "Mar 1, 2026",
-    analyses: "8 analyses",
-  },
-];
+import { useState } from "react"
+import { Search, MoreVertical } from "lucide-react"
 
-export default function DatasetTable() {
-  return (
-    <div className="bg-white border rounded-lg p-6">
+interface Dataset{
+name:string
+owner:string
+type:string
+size:string
+rows:number
+columns:number
+uploadDate:string
+analyses:number
+}
 
-      <div className="flex justify-between mb-4">
+interface Props{
+datasets?:Dataset[]
+}
 
-        <div className="flex gap-3">
+export default function DatasetTable({datasets=[]}:Props){
 
-          <input
-            placeholder="Search datasets by name or owner..."
-            className="border px-3 py-2 rounded-md text-sm w-72"
-          />
+const [type,setType] = useState("All")
 
-          <select className="border px-3 py-2 rounded-md text-sm">
-            <option>All Types</option>
-            <option>CSV</option>
-            <option>Excel</option>
-          </select>
+const filteredDatasets =
+type === "All"
+? datasets
+: datasets.filter(d=>d.type === type)
 
-        </div>
+return(
 
-        <button className="flex items-center gap-2 border px-4 py-2 rounded-md text-sm">
-          <Download size={16} />
-          Export Report
-        </button>
+<div className="p-6">
 
-      </div>
+{/* Search + Filter */}
 
+<div className="flex justify-between items-center mb-6">
 
-      <table className="w-full text-sm">
+<div className="flex items-center gap-3">
 
-        <thead className="text-gray-500 border-b">
-          <tr>
-            <th className="text-left py-3">Dataset Name</th>
-            <th>Owner</th>
-            <th>Type</th>
-            <th>Size</th>
-            <th>Rows</th>
-            <th>Columns</th>
-            <th>Upload Date</th>
-            <th>Analyses</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+<div className="flex items-center border rounded-lg px-3 py-2 w-80">
 
-        <tbody>
+<Search size={16}/>
 
-          {datasets.map((data, i) => (
-            <tr key={i} className="border-b hover:bg-gray-50">
+<input
+placeholder="Search datasets by name or owner..."
+className="ml-2 outline-none w-full text-sm"
+/>
 
-              <td className="py-3 font-medium">{data.name}</td>
+</div>
 
-              <td>{data.owner}</td>
+<select
+value={type}
+onChange={(e)=>setType(e.target.value)}
+className="border px-3 py-2 rounded-lg text-sm"
+>
 
-              <td>
-                <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">
-                  {data.type}
-                </span>
-              </td>
+<option value="All">All Types</option>
+<option value="CSV">CSV</option>
+<option value="Excel">Excel</option>
 
-              <td>{data.size}</td>
+</select>
 
-              <td>{data.rows}</td>
+</div>
 
-              <td>{data.columns}</td>
+<button className="border px-4 py-2 rounded-lg text-sm">
+Export Report
+</button>
 
-              <td>{data.date}</td>
+</div>
 
-              <td>
-                <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                  {data.analyses}
-                </span>
-              </td>
+{/* Empty State */}
 
-              <td>⋮</td>
+{filteredDatasets.length === 0 ?(
 
-            </tr>
-          ))}
+<div className="text-center py-16 text-gray-500 text-sm">
 
-        </tbody>
+No datasets uploaded yet.
+Datasets will appear here when users upload them.
 
-      </table>
-    </div>
-  );
+</div>
+
+):( 
+
+<div className="overflow-x-auto">
+
+<table className="w-full text-sm">
+
+<thead className="border-b bg-gray-50 text-gray-500">
+
+<tr>
+
+<th className="text-left px-4 py-3">Dataset Name</th>
+<th className="px-4 py-3 text-left">Owner</th>
+<th className="px-4 py-3 text-center">Type</th>
+<th className="px-4 py-3 text-right">Size</th>
+<th className="px-4 py-3 text-right">Rows</th>
+<th className="px-4 py-3 text-right">Columns</th>
+<th className="px-4 py-3 text-left">Upload Date</th>
+<th className="px-4 py-3 text-right">Analyses</th>
+<th className="px-4 py-3"></th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{filteredDatasets.map((d,i)=>(
+
+<tr key={i} className="border-b hover:bg-gray-50">
+
+<td className="px-4 py-4 font-medium">
+{d.name}
+</td>
+
+<td className="px-4">
+{d.owner}
+</td>
+
+<td className="text-center px-4">
+<span className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">
+{d.type}
+</span>
+</td>
+
+<td className="text-right px-4">
+{d.size}
+</td>
+
+<td className="text-right px-4">
+{d.rows}
+</td>
+
+<td className="text-right px-4">
+{d.columns}
+</td>
+
+<td className="px-4">
+{d.uploadDate}
+</td>
+
+<td className="text-right px-4 font-medium">
+{d.analyses}
+</td>
+
+<td className="text-right px-4">
+<MoreVertical size={16}/>
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+)}
+
+</div>
+
+)
+
 }

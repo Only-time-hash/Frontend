@@ -2,26 +2,33 @@
 
 import {LineChart,Line,XAxis,YAxis,Tooltip,BarChart,Bar} from "recharts"
 
-const userData=[
- {month:"Jan",users:1600},
- {month:"Feb",users:2000},
- {month:"Mar",users:2400},
- {month:"Apr",users:2600},
- {month:"May",users:2800},
- {month:"Jun",users:3000},
-]
+interface Props{
+ userData?: {month:string,users:number}[]
+ aiUsage?: {day:string,value:number}[]
+}
 
-const aiUsage=[
- {day:"Mon",value:200},
- {day:"Tue",value:350},
- {day:"Wed",value:280},
- {day:"Thu",value:400},
- {day:"Fri",value:370},
- {day:"Sat",value:190},
- {day:"Sun",value:220},
-]
+export default function UsageCharts({userData=[],aiUsage=[]}:Props){
 
-export default function UsageCharts(){
+ const noData = userData.length === 0 && aiUsage.length === 0
+
+ if(noData){
+  return(
+
+   <div className="bg-white p-8 rounded-xl shadow text-center">
+
+    <h3 className="font-semibold text-lg mb-2">
+     Analytics
+    </h3>
+
+    <p className="text-gray-500 text-sm">
+     No analytics data yet.
+     User growth and AI usage charts will appear once activity begins.
+    </p>
+
+   </div>
+
+  )
+ }
 
  return(
 

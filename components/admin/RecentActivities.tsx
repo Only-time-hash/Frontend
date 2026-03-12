@@ -1,82 +1,99 @@
 "use client"
 
-import { CheckCircle, Clock } from "lucide-react"
+import { CheckCircle } from "lucide-react"
 
-const activities = [
-{
-email:"john.doe@example.com",
-action:"Uploaded new dataset",
-file:"sales_q1_2026.csv",
-time:"2 min ago"
-},
-{
-email:"sarah.smith@example.com",
-action:"Completed analysis",
-file:"customer_data.xlsx",
-time:"8 min ago"
-},
-{
-email:"mike.johnson@example.com",
-action:"Started correlation analysis",
-file:"marketing_metrics.csv",
-time:"15 min ago"
+interface Activity{
+ email:string
+ action:string
+ file:string
+ time:string
 }
-]
 
-export default function RecentActivities(){
+interface Props{
+ activities?: Activity[]
+}
 
-return(
+export default function RecentActivities({activities=[]}:Props){
 
-<div className="bg-white p-6 rounded-xl shadow">
+ if(activities.length === 0){
+  return(
 
-<div className="flex justify-between items-center mb-6">
+   <div className="bg-white p-6 rounded-xl shadow">
 
-<h3 className="font-semibold">
-Recent Activities
-</h3>
+    <div className="flex justify-between items-center mb-6">
 
-<button className="text-sm border px-3 py-1 rounded-lg">
-View All
-</button>
+     <h3 className="font-semibold">
+      Recent Activities
+     </h3>
 
-</div>
+     <button className="text-sm border px-3 py-1 rounded-lg">
+      View All
+     </button>
 
-<div className="space-y-4">
+    </div>
 
-{activities.map((activity,i)=>(
+    <div className="text-center py-8 text-gray-500 text-sm">
+     No activity recorded yet.
+     User uploads and analyses will appear here.
+    </div>
 
-<div key={i} className="flex items-start gap-4 p-4 border rounded-lg">
+   </div>
 
-<CheckCircle className="text-green-500" size={18}/>
+  )
+ }
 
-<div className="flex-1">
+ return(
 
-<p className="font-medium text-sm">
-{activity.email}
-</p>
+ <div className="bg-white p-6 rounded-xl shadow">
 
-<p className="text-gray-500 text-sm">
-{activity.action}
-</p>
+ <div className="flex justify-between items-center mb-6">
 
-<p className="text-blue-600 text-sm">
-{activity.file}
-</p>
+ <h3 className="font-semibold">
+ Recent Activities
+ </h3>
 
-</div>
+ <button className="text-sm border px-3 py-1 rounded-lg">
+ View All
+ </button>
 
-<span className="text-xs text-gray-400">
-{activity.time}
-</span>
+ </div>
 
-</div>
+ <div className="space-y-4">
 
-))}
+ {activities.map((activity,i)=>(
 
-</div>
+ <div key={i} className="flex items-start gap-4 p-4 border rounded-lg">
 
-</div>
+ <CheckCircle className="text-green-500" size={18}/>
 
-)
+ <div className="flex-1">
+
+ <p className="font-medium text-sm">
+ {activity.email}
+ </p>
+
+ <p className="text-gray-500 text-sm">
+ {activity.action}
+ </p>
+
+ <p className="text-blue-600 text-sm">
+ {activity.file}
+ </p>
+
+ </div>
+
+ <span className="text-xs text-gray-400">
+ {activity.time}
+ </span>
+
+ </div>
+
+ ))}
+
+ </div>
+
+ </div>
+
+ )
 
 }

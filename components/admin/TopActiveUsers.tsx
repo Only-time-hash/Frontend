@@ -1,92 +1,106 @@
 "use client"
 
-const users = [
-{
-name:"Sarah Smith",
-email:"sarah.smith@example.com",
-analyses:342
-},
-{
-name:"John Doe",
-email:"john.doe@example.com",
-analyses:298
-},
-{
-name:"Emma Wilson",
-email:"emma.wilson@example.com",
-analyses:276
-},
-{
-name:"Mike Johnson",
-email:"mike.johnson@example.com",
-analyses:251
+interface User{
+ name:string
+ email:string
+ analyses:number
 }
-]
 
-export default function TopActiveUsers(){
+interface Props{
+ users?: User[]
+}
 
-return(
+export default function TopActiveUsers({users=[]}:Props){
 
-<div className="bg-white p-6 rounded-xl shadow">
+ if(users.length === 0){
+  return(
 
-<div className="flex justify-between items-center mb-6">
+   <div className="bg-white p-6 rounded-xl shadow">
 
-<h3 className="font-semibold">
-Top Active Users
-</h3>
+    <div className="flex justify-between items-center mb-6">
 
-<button className="text-sm border px-3 py-1 rounded-lg">
-View All
-</button>
+     <h3 className="font-semibold">
+      Top Active Users
+     </h3>
 
-</div>
+     <button className="text-sm border px-3 py-1 rounded-lg">
+      View All
+     </button>
 
-<div className="space-y-4">
+    </div>
 
-{users.map((user,i)=>(
+    <div className="text-center py-8 text-gray-500 text-sm">
+     No active users yet.
+     User activity rankings will appear here once analyses are performed.
+    </div>
 
-<div key={i} className="flex items-center justify-between border p-4 rounded-lg">
+   </div>
 
-<div className="flex items-center gap-4">
+  )
+ }
 
-<div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-sm font-semibold">
-{i+1}
-</div>
+ return(
 
-<div>
+ <div className="bg-white p-6 rounded-xl shadow">
 
-<p className="font-medium text-sm">
-{user.name}
-</p>
+ <div className="flex justify-between items-center mb-6">
 
-<p className="text-gray-500 text-xs">
-{user.email}
-</p>
+ <h3 className="font-semibold">
+ Top Active Users
+ </h3>
 
-</div>
+ <button className="text-sm border px-3 py-1 rounded-lg">
+ View All
+ </button>
 
-</div>
+ </div>
 
-<div className="text-right">
+ <div className="space-y-4">
 
-<p className="font-semibold">
-{user.analyses}
-</p>
+ {users.map((user,i)=>(
 
-<p className="text-xs text-gray-500">
-analyses
-</p>
+ <div key={i} className="flex items-center justify-between border p-4 rounded-lg">
 
-</div>
+ <div className="flex items-center gap-4">
 
-</div>
+ <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-sm font-semibold">
+ {i+1}
+ </div>
 
-))}
+ <div>
 
-</div>
+ <p className="font-medium text-sm">
+ {user.name}
+ </p>
 
-</div>
+ <p className="text-gray-500 text-xs">
+ {user.email}
+ </p>
 
-)
+ </div>
+
+ </div>
+
+ <div className="text-right">
+
+ <p className="font-semibold">
+ {user.analyses}
+ </p>
+
+ <p className="text-xs text-gray-500">
+ analyses
+ </p>
+
+ </div>
+
+ </div>
+
+ ))}
+
+ </div>
+
+ </div>
+
+ )
 
 }
